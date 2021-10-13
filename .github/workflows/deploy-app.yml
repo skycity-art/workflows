@@ -1,0 +1,50 @@
+name: deploy-app
+on:
+  workflow_call:
+    inputs:
+      DOCKER_TAG:
+        description: Docker image tag to deploy
+        type: string
+        default: latest
+        required: false
+    secrets:
+      DOCKER_ENV_FILE:
+        required: true
+      DOCKER_EXTRA_ARGS:
+        required: true
+      SSH_HOST:
+        required: true
+      SSH_PORT:
+        required: true
+      SSH_USERNAME:
+        required: true
+      SSH_KEY:
+        required: true
+      SSH_PASSPHRASE:
+        required: true
+      SSH_FINGERPRINT:
+        required: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v0.1.4
+        env:
+          DOCKER_REGISTRY: ghcr.io
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: ${{ github.token }}
+          DOCKER_IMAGE: ${{ github.repository }}
+          DOCKER_ENV_FILE: ${{ secrets.DOCKER_ENV_FILE }}
+          DOCKER_EXTRA_ARGS: ${{ secrets.DOCKER_EXTRA_ARGS }}
+          DOCKER_TAG: ${{ inputs.DOCKER_TAG }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          fingerprint: ${{ secrets.SSH_FINGERPRINT }}
+          script_stop: true
+          envs: DOCKER_REGISTRY,DOCKER_USERNAME,DOCKER_PASSWORD,DOCKER_IMAGE,DOCKER_ENV_FILE,DOCKER_EXTRA_ARGS,DOCKER_TAG
+          script: source deploy-app.sh

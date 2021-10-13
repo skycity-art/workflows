@@ -1,0 +1,35 @@
+name: docker-build
+on:
+  workflow_call:
+env:
+  DOCKER_REGISTRY: ghcr.io
+  DOCKER_IMAGE: ${{ github.repository }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE }}
+          flavor: latest=true
+          tags: |
+            type=ref,event=branch
+            type=sha            
+
+      - name: Login to GitHub Container Registry
+        id: login
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build and push Docker image
+        id: buildAndPush
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
