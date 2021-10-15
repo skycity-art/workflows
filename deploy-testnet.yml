@@ -1,0 +1,22 @@
+name: deploy-testnet
+on:
+  workflow_dispatch:
+    inputs:
+      DOCKER_TAG:
+        description: Docker image tag to deploy
+        required: true
+        default: latest
+jobs:
+  deploy:
+    uses: skycity-art/workflows/.github/workflows/deploy-app.yml@16c7a1829bf15729a7f0da2606845019528b34a5
+    with:
+      DOCKER_TAG: ${{ github.event.inputs.DOCKER_TAG }}
+    secrets:
+      DOCKER_ENV_FILE: ${{ secrets.TESTNET_DOCKER_ENV_FILE }}
+      DOCKER_EXTRA_ARGS: ${{ secrets.DOCKER_EXTRA_ARGS }}
+      SSH_HOST: ${{ secrets.TESTNET_SSH_HOST }}
+      SSH_PORT: ${{ secrets.TESTNET_SSH_PORT }}
+      SSH_USERNAME: ${{ secrets.TESTNET_SSH_USERNAME }}
+      SSH_KEY: ${{ secrets.TESTNET_SSH_KEY }}
+      SSH_PASSPHRASE: ${{ secrets.TESTNET_SSH_PASSPHRASE }}
+      SSH_FINGERPRINT: ${{ secrets.TESTNET_SSH_FINGERPRINT }}

@@ -1,0 +1,22 @@
+name: deploy-staging
+on:
+  workflow_run:
+    workflows:
+      - docker-build
+    branches:
+      - master
+    types:
+      - completed
+jobs:
+  deploy:
+    uses: skycity-art/workflows/.github/workflows/deploy-app.yml@16c7a1829bf15729a7f0da2606845019528b34a5
+    if: github.event.workflow_run.conclusion == 'success'
+    secrets:
+      DOCKER_ENV_FILE: ${{ secrets.STAGING_DOCKER_ENV_FILE }}
+      DOCKER_EXTRA_ARGS: ${{ secrets.DOCKER_EXTRA_ARGS }}
+      SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+      SSH_PORT: ${{ secrets.STAGING_SSH_PORT }}
+      SSH_USERNAME: ${{ secrets.STAGING_SSH_USERNAME }}
+      SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+      SSH_PASSPHRASE: ${{ secrets.STAGING_SSH_PASSPHRASE }}
+      SSH_FINGERPRINT: ${{ secrets.STAGING_SSH_FINGERPRINT }}

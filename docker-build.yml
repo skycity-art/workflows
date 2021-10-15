@@ -1,0 +1,8 @@
+name: docker-build
+on:
+  push:
+    branches:
+      - "master"
+jobs:
+  build:
+    uses: skycity-art/workflows/.github/workflows/docker-build.yml@16c7a1829bf15729a7f0da2606845019528b34a5
